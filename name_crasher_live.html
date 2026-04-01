@@ -1,0 +1,382 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    font-family: 'DM Mono', monospace;
+    background: var(--color-background-tertiary);
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+  .subtitle {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: 2.5rem;
+  }
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 560px;
+  }
+  .input-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+  #nameInput {
+    flex: 1;
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #nameInput:focus { border-color: var(--color-border-primary); box-shadow: 0 0 0 3px rgba(0,0,0,0.05); }
+  #nameInput::placeholder { color: var(--color-text-tertiary); font-size: 13px; }
+  .btn {
+    padding: 10px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background 0.12s, transform 0.1s, opacity 0.12s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn-insert {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+    border-color: transparent;
+    font-size: 14px;
+    padding: 10px 22px;
+  }
+  .btn-insert:hover { opacity: 0.85; background: var(--color-text-primary); }
+  .controls-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  .pill {
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 99px;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: 'DM Mono', monospace;
+  }
+  .pill.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
+  .pill-label { font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.5px; margin-right: 2px; }
+  .nationality-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .nat-select {
+    padding: 6px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    outline: none;
+    cursor: pointer;
+  }
+  .result-area {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0.5px dashed var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .result-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 2px;
+    color: var(--color-text-primary);
+    text-align: center;
+    line-height: 1.3;
+    word-break: break-word;
+    width: 100%;
+  }
+  .result-placeholder { font-size: 13px; color: var(--color-text-tertiary); letter-spacing: 0.5px; }
+  .inserted-highlight { background: rgba(29,158,117,0.15); border-radius: 3px; padding: 0 3px; color: #1D9E75; }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--color-border-tertiary);
+    border-top-color: #1D9E75;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .bottom-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .history-label { font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.5px; }
+  .history-list { display: flex; flex-direction: column; gap: 6px; margin-top: 1.25rem; max-height: 160px; overflow-y: auto; }
+  .history-item {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    padding: 6px 10px;
+    border-radius: var(--border-radius-md);
+    background: var(--color-background-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.1s;
+    font-family: 'DM Mono', monospace;
+  }
+  .history-item:hover { background: var(--color-background-tertiary); }
+  .nat-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: var(--color-background-tertiary);
+    color: var(--color-text-tertiary);
+    border: 0.5px solid var(--color-border-tertiary);
+    margin-left: 8px;
+    white-space: nowrap;
+  }
+  .err-msg { font-size: 12px; color: #E24B4A; margin-top: 8px; display: none; }
+  @keyframes pop {
+    0% { transform: scale(0.9); opacity: 0; }
+    60% { transform: scale(1.04); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pop { animation: pop 0.22s ease forwards; }
+</style>
+
+<div id="app">
+  <h1>Name Crasher</h1>
+  <p class="subtitle">insert a live random name from a global database</p>
+
+  <div class="card">
+    <div class="input-row">
+      <input type="text" id="nameInput" placeholder="e.g. Andre Stewart Junior Charles" />
+      <button class="btn btn-insert" id="insertBtn" onclick="insertName()">insert</button>
+    </div>
+
+    <div class="controls-row">
+      <span class="pill-label">position</span>
+      <button class="pill active" onclick="setPos('random',this)">random</button>
+      <button class="pill" onclick="setPos('first',this)">first</button>
+      <button class="pill" onclick="setPos('last',this)">last</button>
+      <button class="pill" onclick="setPos('middle',this)">middle</button>
+    </div>
+
+    <div class="nationality-row">
+      <span class="pill-label">name type</span>
+      <button class="pill active" onclick="setNameType('last',this)">last name</button>
+      <button class="pill" onclick="setNameType('first',this)">first name</button>
+      <button class="pill" onclick="setNameType('both',this)">first + last</button>
+      <select class="nat-select" id="natSelect">
+        <option value="">any nationality</option>
+        <option value="au">australian</option>
+        <option value="br">brazilian</option>
+        <option value="ca">canadian</option>
+        <option value="ch">swiss</option>
+        <option value="de">german</option>
+        <option value="dk">danish</option>
+        <option value="es">spanish</option>
+        <option value="fi">finnish</option>
+        <option value="fr">french</option>
+        <option value="gb">british</option>
+        <option value="ie">irish</option>
+        <option value="in">indian</option>
+        <option value="ir">iranian</option>
+        <option value="mx">mexican</option>
+        <option value="nl">dutch</option>
+        <option value="no">norwegian</option>
+        <option value="nz">new zealand</option>
+        <option value="rs">serbian</option>
+        <option value="tr">turkish</option>
+        <option value="ua">ukrainian</option>
+        <option value="us">american</option>
+      </select>
+    </div>
+
+    <div class="result-area" id="resultArea">
+      <div class="spinner" id="spinner"></div>
+      <span class="result-placeholder" id="resultPlaceholder">your crashed name appears here</span>
+      <div class="result-text" id="resultText" style="display:none;"></div>
+    </div>
+    <div class="err-msg" id="errMsg">couldn't reach the name database — try again</div>
+
+    <div class="bottom-row">
+      <span class="history-label" id="countLabel"></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="clearHistory()" style="font-size:11px;padding:7px 12px;">clear</button>
+        <button class="btn" onclick="copyResult()" id="copyBtn" style="font-size:11px;padding:7px 12px;">copy</button>
+      </div>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+</div>
+
+<script>
+let position = 'random';
+let nameType = 'last';
+let history = [];
+let lastResult = '';
+let loading = false;
+
+function setPos(p, el) {
+  position = p;
+  el.closest('.controls-row').querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function setNameType(t, el) {
+  nameType = t;
+  el.closest('.nationality-row').querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function fetchRandomName() {
+  const nat = document.getElementById('natSelect').value;
+  let url = 'https://randomuser.me/api/?inc=name';
+  if (nat) url += '&nat=' + nat;
+  const res = await fetch(url);
+  const data = await res.json();
+  const n = data.results[0].name;
+  if (nameType === 'last') return n.last;
+  if (nameType === 'first') return n.first;
+  return n.first + ' ' + n.last;
+}
+
+async function insertName() {
+  if (loading) return;
+  const input = document.getElementById('nameInput').value.trim();
+  if (!input) { document.getElementById('nameInput').focus(); return; }
+
+  loading = true;
+  const btn = document.getElementById('insertBtn');
+  const spinner = document.getElementById('spinner');
+  const errMsg = document.getElementById('errMsg');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  document.getElementById('resultPlaceholder').style.display = 'none';
+  document.getElementById('resultText').style.display = 'none';
+  errMsg.style.display = 'none';
+
+  let newName;
+  try {
+    newName = await fetchRandomName();
+  } catch(e) {
+    errMsg.style.display = 'block';
+    spinner.style.display = 'none';
+    btn.disabled = false;
+    loading = false;
+    document.getElementById('resultPlaceholder').style.display = 'block';
+    return;
+  }
+
+  spinner.style.display = 'none';
+  btn.disabled = false;
+  loading = false;
+
+  const words = input.split(/\s+/).filter(Boolean);
+  let insertAt;
+  if (position === 'first') insertAt = 0;
+  else if (position === 'last') insertAt = words.length;
+  else if (position === 'middle') {
+    insertAt = words.length <= 1 ? (Math.random() < 0.5 ? 0 : 1) : Math.floor(words.length / 2);
+  } else {
+    insertAt = Math.floor(Math.random() * (words.length + 1));
+  }
+
+  const newWords = [...words];
+  const insertWords = newName.split(' ');
+  newWords.splice(insertAt, 0, ...insertWords);
+  const full = newWords.join(' ');
+  lastResult = full;
+
+  const htmlParts = newWords.map((w, i) => {
+    const isNew = i >= insertAt && i < insertAt + insertWords.length;
+    return isNew ? `<span class="inserted-highlight">${w}</span>` : w;
+  });
+
+  const nat = document.getElementById('natSelect').value;
+  const natLabel = nat ? nat.toUpperCase() : '?';
+
+  const resultEl = document.getElementById('resultText');
+  resultEl.innerHTML = htmlParts.join(' ');
+  resultEl.style.display = 'block';
+  resultEl.classList.remove('pop');
+  void resultEl.offsetWidth;
+  resultEl.classList.add('pop');
+
+  history.unshift({ original: input, result: full, name: newName, nat: natLabel });
+  if (history.length > 12) history.pop();
+  renderHistory();
+  updateCount();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!history.length) { list.innerHTML = ''; return; }
+  list.innerHTML = history.map((h, i) => {
+    const safe = h.result.replace(/</g,'&lt;');
+    const highlighted = safe.split(' ').map(w => {
+      return h.name.split(' ').some(n => n.toLowerCase() === w.toLowerCase())
+        ? `<span style="color:#1D9E75">${w}</span>` : w;
+    }).join(' ');
+    return `<div class="history-item" onclick="loadHistory(${i})">
+      <span style="font-size:11px;">${highlighted}</span>
+      <span class="nat-badge">${h.nat}</span>
+    </div>`;
+  }).join('');
+}
+
+function loadHistory(i) {
+  document.getElementById('nameInput').value = history[i].original;
+}
+
+function updateCount() {
+  document.getElementById('countLabel').textContent = history.length ? `${history.length} result${history.length > 1 ? 's' : ''}` : '';
+}
+
+function clearHistory() {
+  history = [];
+  renderHistory();
+  updateCount();
+  document.getElementById('resultText').style.display = 'none';
+  document.getElementById('resultPlaceholder').style.display = 'block';
+  lastResult = '';
+}
+
+function copyResult() {
+  if (!lastResult) return;
+  navigator.clipboard.writeText(lastResult).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
+}
+
+document.getElementById('nameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') insertName();
+});
+</script>
